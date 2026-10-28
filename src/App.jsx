@@ -31,6 +31,51 @@ function getRisk(value) {
   if (value >= 50) return "Medium";
   return "Low";
 }
+function assessIncidentPriority(incident) {
+  const severityScores = {
+    High: 90,
+    Medium: 60,
+    Low: 25,
+  };
+
+  const typeWeights = {
+    "Fire hazard": 10,
+    "Blocked exit": 10,
+    "Medical assistance": 5,
+    "Crowd congestion": 5,
+    "Missing person": 0,
+    Other: 0,
+  };
+
+  const baseScore = severityScores[incident.severity] ?? 25;
+  const typeWeight = typeWeights[incident.type] ?? 0;
+
+  const priorityScore = Math.min(100, baseScore + typeWeight);
+
+  let priorityLevel = "Low";
+
+  if (priorityScore >= 70) {
+    priorityLevel = "High";
+  } else if (priorityScore >= 40) {
+    priorityLevel = "Medium";
+  }
+
+  let reason = "Routine monitoring and follow-up are recommended.";
+
+  if (priorityLevel === "High") {
+    reason =
+      "High-priority incident requiring prompt assessment by designated responders.";
+  } else if (priorityLevel === "Medium") {
+    reason =
+      "Moderate-priority incident requiring timely assessment and follow-up.";
+  }
+
+  return {
+    priorityScore,
+    priorityLevel,
+    reason,
+  };
+}
 
 function getResponsePlan(incident) {
   const type = incident.type.toLowerCase();
@@ -623,6 +668,27 @@ const emergencyAlerts = incidents.filter(
                         <span>Score: {incident.priorityScore ?? "N/A"}/100</span>
                         <span>{incident.status}</span>
                         </div>
+                        {(() => {
+                          const assessment = assessIncidentPriority(incident);
+                          return (
+                          <div className="priority-assessment">
+                            <div className="priority-assessment-header">
+                              <strong>Priority Assessment</strong>
+                              <span className={`priority-badge ${assessment.priorityLevel.toLowerCase()}`}>
+                                {assessment.priorityLevel} Priority
+                                </span>
+                                </div>
+                                <p>
+                                  <strong>Risk score:</strong> {assessment.priorityScore}/100
+                                  </p>
+                                  <p>{assessment.reason}</p>
+                                  <small>
+                                    Rule-based prototype assessment. Verify reports and follow
+                                    established emergency procedures.
+                                    </small>
+                                    </div>
+                                    );
+                                    })()}
                        <div className="response-plan">
                         <h4>Response Recommendation</h4>
                         <p>

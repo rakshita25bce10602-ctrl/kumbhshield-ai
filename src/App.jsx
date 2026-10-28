@@ -32,6 +32,73 @@ function getRisk(value) {
   return "Low";
 }
 
+function getResponsePlan(incident) {
+  const type = incident.type.toLowerCase();
+
+  if (type.includes("medical")) {
+    return {
+      team: "Medical Response Team",
+      actions: [
+        "Notify the designated medical response team.",
+        "Confirm the reported location and situation.",
+        "Coordinate assistance through trained responders.",
+      ],
+    };
+  }
+
+  if (type.includes("crowd")) {
+    return {
+      team: "Crowd Management Team",
+      actions: [
+        "Notify the designated crowd management team.",
+        "Verify crowd conditions at the reported location.",
+        "Coordinate safe movement with trained personnel.",
+      ],
+    };
+  }
+
+  if (type.includes("missing")) {
+    return {
+      team: "Security and Help Desk",
+      actions: [
+        "Notify the designated help desk and security team.",
+        "Record the information provided in the report.",
+        "Follow the site's established missing-person procedure.",
+      ],
+    };
+  }
+
+  if (type.includes("fire")) {
+    return {
+      team: "Fire and Safety Team",
+      actions: [
+        "Notify the designated fire and safety team.",
+        "Follow the site's established fire emergency procedure.",
+        "Keep people away from the reported hazard when safe to do so.",
+      ],
+    };
+  }
+
+  if (type.includes("blocked exit")) {
+    return {
+      team: "Safety and Access Team",
+      actions: [
+        "Notify the designated safety team.",
+        "Verify the reported obstruction.",
+        "Coordinate safe access restoration with trained personnel.",
+      ],
+    };
+  }
+
+  return {
+    team: "Incident Response Team",
+    actions: [
+      "Notify the designated response team.",
+      "Verify the reported situation and location.",
+      "Follow the site's established emergency procedure.",
+    ],
+  };
+}
 function App() {
   const [zones, setZones] = useState(initialZones);
   const [incidents, setIncidents] = useState(() => {
@@ -556,7 +623,24 @@ const emergencyAlerts = incidents.filter(
                         <span>Score: {incident.priorityScore ?? "N/A"}/100</span>
                         <span>{incident.status}</span>
                         </div>
-                      <button
+                       <div className="response-plan">
+                        <h4>Response Recommendation</h4>
+                        <p>
+                          <strong>Recommended team:</strong>{" "}
+                          {getResponsePlan(incident).team}
+                          </p>
+                          <strong>Suggested actions</strong>
+                          <ul>
+                            {getResponsePlan(incident).actions.map((action, index) => (
+                              <li key={index}>{action}</li>
+                              ))}
+                              </ul>
+                              <p className="response-note">
+                                Prototype-generated guidance. Verify reports and follow
+                                established emergency procedures.
+                                </p>
+                                </div> 
+                                <button
                         className="text-button"
                         onClick={() => updateStatus(incident.id)}
                         title={
